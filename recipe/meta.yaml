@@ -1,6 +1,5 @@
 {% set name = "timezonefinder" %}
-{% set version = "6.1.5" %}
-{% set sha256 = "07b9c217920fc128bd800ab1165b4f9d14242aeb07d9e668ef3987185bc758c0" %}
+{% set version = "6.2.0" %}
 
 package:
   name: {{ name|lower }}
@@ -9,34 +8,41 @@ package:
 source:
   fn: {{ name }}-{{ version }}.tar.gz
   url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: {{ sha256 }}
+  sha256: d41fd2650bb4221fae5a61f9c2767158f9727c4aaca95e24da86394feb704220
 
 build:
   number: 0
-  script: {{ PYTHON }} -m pip install . --no-deps -vv
-#  noarch: python
+  # numba not available for s390x
+  skip: true  # [py<38 or s390x]
+  script: {{ PYTHON }} -m pip install . --no-deps --no-build-isolation -vv
 
 requirements:
   build:
-    - poetry
-    - cffi
-    - setuptools
     - {{ compiler('c') }}
   host:
+    - python
     - pip
-    - python 3
-    - poetry
+    - poetry-core >=1.0.0
+    - cffi >=1.15.1,<2
+    - setuptools
   run:
-    - python 3
-    - numpy
-    - h3-py
+    - python
+    - numpy >=1.18,<2
+    - h3-py >=3.7.6,<4
     - numba
-    - cffi
+    - cffi >=1.15.1
+  run_constrained:
+    - numba >=0.56,<1
+    - pytz >=2022.7.1
 
 test:
   imports:
     - timezonefinder
     - timezonefinder.timezonefinder
+  requires:
+    - pip
+  commands:
+    - pip check
 
 about:
   home: https://timezonefinder.michelfe.it/gui
@@ -47,10 +53,12 @@ about:
   description: |
     This is a fast and lightweight python package for looking up the corresponding timezone for given 
     corresponding timezone for a given lat/lng on earth entirely offline.
-
+  doc_url: https://timezonefinder.readthedocs.io
   dev_url: https://github.com/jannikmi/timezonefinder
 
 extra:
   recipe-maintainers:
     - snowman2
     - jannikmi
+  skip-lints:
+    - missing_wheel
