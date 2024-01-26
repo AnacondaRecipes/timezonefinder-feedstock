@@ -19,17 +19,16 @@ build:
 requirements:
   build:
     - {{ compiler('c') }}
-    - poetry-core >=1.0.0
-    - cffi
-    - setuptools
   host:
     - python
     - pip
-    - poetry
+    - poetry-core >=1.0.0
+    - cffi >=1.15.1,<2
+    - setuptools
   run:
     - python
-    - numpy {{numpy}}
-    - h3-py
+    - numpy >=1.18,<2
+    - h3-py >=3.7.6,<4
     - numba
     - cffi >=1.15.1
   run_constrained:
